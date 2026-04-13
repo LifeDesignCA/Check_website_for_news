@@ -26,7 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install requests beautifulsoup4; fi
+          pip install requests beautifulsoup4
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run monitoring script
         env:
@@ -35,33 +36,15 @@ jobs:
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
         run: python check_changes.py
 
-      - name: Commit updated baseline & diff log
+      - name: Commit changes
         run: |
           git config user.name "liliskane-bot"
           git config user.email "bot@liliskane-monitor"
-          
-          # Vérifier si les dossiers existent avant d'ajouter
           mkdir -p data logs
-          git add data/ logs/ || true
-
+          git add data/ logs/
           if git diff --cached --quiet; then
-            echo "Rien à committer — pas de changement de données."
+            echo "Pas de changements."
           else
-            DIFF_SUMMARY=$(python - <<'EOF'
-import json, glob, os
-logs = sorted(glob.glob("logs/diff_*.json"))
-if logs:
-    try:
-        with open(logs[-1]) as f:
-            d = json.load(f)
-        print(f"[{d.get('date', 'N/A')}] +{len(d.get('nouveaux', []))} nouveau(x), -{len(d.get('supprimes', []))} supprimé(s)")
-    except:
-        print("Mise à jour des données")
-else:
-    print("Mise à jour baseline")
-EOF
-)
-            git commit -m "📊 $DIFF_SUMMARY"
+            git commit -m "📊 Mise à jour des données Liliskane"
             git push
-            echo "✅ Commit poussé."
           fi
