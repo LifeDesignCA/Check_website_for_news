@@ -1,30 +1,23 @@
-name: 🏠 Liliskane Daily Monitor
+name: "🏠 Liliskane Daily Monitor"
 
 on:
   schedule:
-    # 08:00 UTC = 09:00 Maroc (GMT+1 permanent depuis 2018)
     - cron: "0 8 * * *"
-
-  # Permet de lancer manuellement depuis l'onglet Actions de GitHub
   workflow_dispatch:
 
 jobs:
   monitor:
     name: Scrape & Detect Changes
     runs-on: ubuntu-latest
-
-    # Nécessaire pour que le job puisse commit/push le CSV mis à jour
     permissions:
       contents: write
 
     steps:
-      # ── 1. Checkout ──────────────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # historique complet pour un git diff propre
+          fetch-depth: 0
 
-      # ── 2. Python ────────────────────────────────────────────────────────────
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -32,28 +25,25 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install requests beautifulsoup4; fi
 
-      # ── 3. Monitoring ────────────────────────────────────────────────────────
       - name: Run monitoring script
         env:
-          EMAIL_SENDER:    ${{ secrets.EMAIL_SENDER }}
-          EMAIL_PASSWORD:  ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
-          # Optionnel — décommentez si vous n'utilisez pas Gmail :
-          # SMTP_HOST:     ${{ secrets.SMTP_HOST }}
-          # SMTP_PORT:     ${{ secrets.SMTP_PORT }}
         run: python check_changes.py
 
-      # ── 4. Commit du CSV mis à jour + du log JSON ────────────────────────────
       - name: Commit updated baseline & diff log
         run: |
-          git config user.name  "liliskane-bot"
+          git config user.name "liliskane-bot"
           git config user.email "bot@liliskane-monitor"
+          
+          # Vérifier si les dossiers existent avant d'ajouter
+          mkdir -p data logs
+          git add data/ logs/ || true
 
-          git add data/projets_liliskane.csv logs/
-
-          # Commit uniquement s'il y a des changements
           if git diff --cached --quiet; then
             echo "Rien à committer — pas de changement de données."
           else
@@ -61,11 +51,14 @@ jobs:
 import json, glob, os
 logs = sorted(glob.glob("logs/diff_*.json"))
 if logs:
-    with open(logs[-1]) as f:
-        d = json.load(f)
-    print(f"[{d['date']}] +{len(d['nouveaux'])} nouveau(x), -{len(d['supprimes'])} supprimé(s), ~{len(d['modifies'])} modifié(s)")
+    try:
+        with open(logs[-1]) as f:
+            d = json.load(f)
+        print(f"[{d.get('date', 'N/A')}] +{len(d.get('nouveaux', []))} nouveau(x), -{len(d.get('supprimes', []))} supprimé(s)")
+    except:
+        print("Mise à jour des données")
 else:
-    print("mise à jour baseline")
+    print("Mise à jour baseline")
 EOF
 )
             git commit -m "📊 $DIFF_SUMMARY"
