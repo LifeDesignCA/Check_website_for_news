@@ -203,34 +203,51 @@ def _build_html(diff: dict) -> str:
 
 
 def envoyer_email(diff: dict) -> None:
+    # 1. Configuration des variables d'environnement
     sender    = os.environ["EMAIL_SENDER"]
     password  = os.environ["EMAIL_PASSWORD"]
-    # 1. On récupère la chaîne (ex: "mail1@test.com, mail2@test.com") 
-    # et on la transforme en liste réelle
     raw_recipients = os.environ.get("EMAIL_RECIPIENT", "")
     recipients = [r.strip() for r in raw_recipients.split(",") if r.strip()]
     
     host      = os.environ.get("SMTP_HOST", "smtp.gmail.com")
     port      = int(os.environ.get("SMTP_PORT", 587))
 
-    # ... (le reste de votre logique de sujet et corps reste identique)
+    # --- CORRECTION DE L'ERREUR ICI ---
+    # On définit 'subject' AVANT de l'utiliser dans msg["Subject"]
+    n = len(diff["nouveaux"]) + len(diff["supprimes"]) + len(diff["modifies"])
+    subject = f"[Liliskane] {n} changement(s) détecté(s) le {diff['date']}"
+    # ----------------------------------
 
+    # 2. Création du message
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = sender
-    # 2. IMPORTANT : Le champ "To" doit être une seule chaîne de caractères séparée par des virgules
     msg["To"]      = ", ".join(recipients)
 
-    # ... (attachement du texte et HTML)
+    # Version texte brut (Fallback)
+    txt = (
+        f"Rapport Liliskane — {diff['date']}\n"
+        f"Nouveaux   : {len(diff['nouveaux'])}\n"
+        f"Supprimés  : {len(diff['supprimes'])}\n"
+        f"Modifiés   : {len(diff['modifies'])}\n\n"
+    )
+    
+    # Ajout du contenu HTML généré par _build_html
+    html_content = _build_html(diff)
+    
+    msg.attach(MIMEText(txt, "plain", "utf-8"))
+    msg.attach(MIMEText(html_content, "html", "utf-8"))
 
-    with smtplib.SMTP(host, port) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.login(sender, password)
-        # 3. On passe la LISTE complète ici
-        smtp.sendmail(sender, recipients, msg.as_string())
-
-    print(f"📧 Email envoyé à {len(recipients)} destinataire(s)")
+    # 3. Envoi via SMTP
+    try:
+        with smtplib.SMTP(host, port) as smtp:
+            smtp.ehlo()
+            smtp.starttls()  # Sécurise la connexion
+            smtp.login(sender, password)
+            smtp.sendmail(sender, recipients, msg.as_string())
+        print(f"📧 Email envoyé avec succès à {len(recipients)} destinataire(s)")
+    except Exception as e:
+        print(f"❌ Erreur lors de l'envoi de l'email : {e}")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
