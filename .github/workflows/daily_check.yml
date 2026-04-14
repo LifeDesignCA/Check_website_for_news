@@ -42,14 +42,22 @@ jobs:
           git config user.name "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
           
-          # On ajoute tout ce qui a été modifié (le -A inclut tout)
+          # 1. On ajoute TOUT (le -A force l'ajout de tous les fichiers modifiés/nouveaux)
           git add -A
           
-          # On vérifie s'il y a quelque chose à committer
+          # 2. On vérifie s'il y a du contenu à envoyer
           if git diff --cached --quiet; then
-            echo "Aucun changement détecté."
+            echo "Rien à committer."
           else
             git commit -m "📊 Mise à jour des données Liliskane"
+            
+            # 3. LE FIX : On récupère les modifs distantes avec autostash
+            # Cela met les "unstaged changes" de côté, fait le rebase, et les remet après.
+            git pull origin main --rebase --autostash
+            
+            # 4. On pousse enfin
+            git push origin main
+          fi
             
             # LE SECRET : pull avec autostash pour gérer les fichiers restants
             git pull origin main --rebase --autostash
