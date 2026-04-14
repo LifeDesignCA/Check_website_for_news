@@ -41,11 +41,11 @@ jobs:
           git config user.name "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
 
-          # Créer/mettre à jour .gitignore pour exclure __pycache__ définitivement
+          # Créer .gitignore si absent
           grep -qxF '__pycache__/' .gitignore 2>/dev/null || echo '__pycache__/' >> .gitignore
           grep -qxF '*.pyc'        .gitignore 2>/dev/null || echo '*.pyc'        >> .gitignore
 
-          # Retirer __pycache__ du tracking Git
+          # Retirer __pycache__ du tracking AVANT git add
           git rm -r --cached __pycache__/ 2>/dev/null || true
 
           git add -A
