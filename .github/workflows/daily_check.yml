@@ -44,11 +44,10 @@ jobs:
           mkdir -p data logs
           git add data/ logs/
           
-          if git diff --cached --quiet; then
-            echo "Pas de changements à committer."
-          else
+          if ! git diff --cached --quiet; then
             git commit -m "📊 Mise à jour des données Liliskane"
-            # Synchronisation avant le push pour éviter l'erreur (non-fast-forward)
-            git pull origin main --rebase
-            git push origin main
           fi
+          
+          git fetch origin
+          git rebase origin/main
+          git push origin main
