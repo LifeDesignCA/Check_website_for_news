@@ -1,8 +1,8 @@
-name: "🏠 Liliskane Daily Monitor"
+name: 🏠 Liliskane Daily Monitor
 
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "0 12 * * *"  # 08:00 UTC = 04:00 EST (Montréal)
   workflow_dispatch:
 
 jobs:
@@ -13,11 +13,13 @@ jobs:
       contents: write
 
     steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # ── 2. Python ────────────────────────────────────────────────────────────
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -26,34 +28,50 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install requests beautifulsoup4
+          fi
 
+      # ── 3. Monitoring ────────────────────────────────────────────────────────
       - name: Run monitoring script
         env:
-          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_SENDER:    ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD:  ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          # Décommentez si vous n'utilisez pas Gmail :
+          # SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          # SMTP_PORT: ${{ secrets.SMTP_PORT }}
         run: python check_changes.py
 
-      - name: Commit and push changes
+      # ── 4. Commit du CSV mis à jour + du log JSON ────────────────────────────
+      - name: Commit updated baseline & diff log
         run: |
-          git config user.name "liliskane-bot"
+          git config user.name  "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
 
-          # Créer .gitignore si absent
-          grep -qxF '__pycache__/' .gitignore 2>/dev/null || echo '__pycache__/' >> .gitignore
-          grep -qxF '*.pyc'        .gitignore 2>/dev/null || echo '*.pyc'        >> .gitignore
-
-          # Retirer __pycache__ du tracking AVANT git add
-          git rm -r --cached __pycache__/ 2>/dev/null || true
-
-          git add -A
+          mkdir -p data logs
+          git add data/ logs/
 
           if git diff --cached --quiet; then
-            echo "Rien à enregistrer aujourd'hui."
+            echo "Rien à committer — pas de changement de données."
           else
-            git commit -m "📊 Mise à jour des données Liliskane — $(date +'%Y-%m-%d')"
-            git pull origin main --rebase --autostash -X ours
+            DIFF_SUMMARY=$(python - <<'EOF'
+import json, glob
+logs = sorted(glob.glob("logs/diff_*.json"))
+if logs:
+    try:
+        with open(logs[-1]) as f:
+            d = json.load(f)
+        print(f"[{d.get('date', 'N/A')}] +{len(d.get('nouveaux', []))} nouveau(x), -{len(d.get('supprimes', []))} supprimé(s), ~{len(d.get('modifies', []))} modifié(s)")
+    except Exception:
+        print("Mise à jour des données")
+else:
+    print("Mise à jour baseline")
+EOF
+)
+            git commit -m "📊 $DIFF_SUMMARY"
+            git pull origin main --rebase --autostash
             git push origin main
           fi
