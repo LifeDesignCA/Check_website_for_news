@@ -42,17 +42,17 @@ jobs:
           git config user.name "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
           
-          # 1. On synchronise d'abord avec le serveur
-          git pull origin main --rebase
+          # On ajoute tout ce qui a été modifié (le -A inclut tout)
+          git add -A
           
-          # 2. On s'assure que les dossiers existent et on ajoute les fichiers
-          mkdir -p data logs
-          git add data/projets_liliskane.csv logs/
-          
-          # 3. On commit et on push seulement s'il y a du nouveau
+          # On vérifie s'il y a quelque chose à committer
           if git diff --cached --quiet; then
-            echo "Aucun changement à committer."
+            echo "Aucun changement détecté."
           else
             git commit -m "📊 Mise à jour des données Liliskane"
+            
+            # LE SECRET : pull avec autostash pour gérer les fichiers restants
+            git pull origin main --rebase --autostash
+            
             git push origin main
           fi
