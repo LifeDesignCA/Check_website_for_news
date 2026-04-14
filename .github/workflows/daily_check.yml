@@ -2,7 +2,7 @@ name: "🏠 Liliskane Daily Monitor"
 
 on:
   schedule:
-    - cron: "0 12 * * *"  # 12:00 UTC correspond à 13:00 au Maroc (UTC+1)
+    - cron: "0 12 * * *"
   workflow_dispatch:
 
 jobs:
@@ -33,28 +33,26 @@ jobs:
         env:
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          # Assure-toi que ton secret contient les emails séparés par des virgules
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
         run: python check_changes.py
 
-      - name: Commit and Push changes
+      - name: Commit and push changes
         run: |
           git config user.name "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
-      
-          # Ajouter tous les fichiers modifiés
+
+          # Ignore __pycache__ at runtime in case .gitignore is missing
+          git rm -r --cached __pycache__/ 2>/dev/null || true
+
           git add -A
-      
-          # Vérifier s'il y a des changements
+
           if git diff --cached --quiet; then
             echo "Rien à enregistrer aujourd'hui."
           else
-            # Commit
-            git commit -m "📊 Mise à jour des données Liliskane"
-      
-            # Synchroniser avec GitHub
-            git pull origin main --rebase --autostash
-      
-            # Push
+            git commit -m "📊 Mise à jour des données Liliskane — $(date +'%Y-%m-%d')"
+
+            # -X ours = on garde notre version en cas de conflit (bot = source de vérité)
+            git pull origin main --rebase --autostash -X ours
+
             git push origin main
           fi
