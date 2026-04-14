@@ -41,17 +41,18 @@ jobs:
         run: |
           git config user.name "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
-          mkdir -p data logs
-          git add data/ logs/
           
+          # 1. On synchronise d'abord avec le serveur
+          git pull origin main --rebase
+          
+          # 2. On s'assure que les dossiers existent et on ajoute les fichiers
+          mkdir -p data logs
+          git add data/projets_liliskane.csv logs/
+          
+          # 3. On commit et on push seulement s'il y a du nouveau
           if git diff --cached --quiet; then
-            echo "Aucun changement à enregistrer."
+            echo "Aucun changement à committer."
           else
             git commit -m "📊 Mise à jour des données Liliskane"
-            
-            # 1. On récupère les changements distants (le secret pour éviter l'erreur)
-            git pull origin main --rebase
-            
-            # 2. On pousse les changements fusionnés
             git push origin main
           fi
