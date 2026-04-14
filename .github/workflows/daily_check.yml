@@ -41,7 +41,11 @@ jobs:
           git config user.name "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
 
-          # Ignore __pycache__ at runtime in case .gitignore is missing
+          # Créer/mettre à jour .gitignore pour exclure __pycache__ définitivement
+          grep -qxF '__pycache__/' .gitignore 2>/dev/null || echo '__pycache__/' >> .gitignore
+          grep -qxF '*.pyc'        .gitignore 2>/dev/null || echo '*.pyc'        >> .gitignore
+
+          # Retirer __pycache__ du tracking Git
           git rm -r --cached __pycache__/ 2>/dev/null || true
 
           git add -A
@@ -50,9 +54,6 @@ jobs:
             echo "Rien à enregistrer aujourd'hui."
           else
             git commit -m "📊 Mise à jour des données Liliskane — $(date +'%Y-%m-%d')"
-
-            # -X ours = on garde notre version en cas de conflit (bot = source de vérité)
             git pull origin main --rebase --autostash -X ours
-
             git push origin main
           fi
