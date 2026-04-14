@@ -2,7 +2,7 @@ name: 🏠 Liliskane Daily Monitor
 
 on:
   schedule:
-    - cron: "0 12 * * *"  # 08:00 UTC = 04:00 EST (Montréal)
+    - cron: "0 8 * * *"  # 08:00 UTC = 04:00 EST (Montréal)
   workflow_dispatch:
 
 jobs:
@@ -40,7 +40,6 @@ jobs:
           EMAIL_SENDER:    ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD:  ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
-          # Décommentez si vous n'utilisez pas Gmail :
           # SMTP_HOST: ${{ secrets.SMTP_HOST }}
           # SMTP_PORT: ${{ secrets.SMTP_PORT }}
         run: python check_changes.py
@@ -57,8 +56,9 @@ jobs:
           if git diff --cached --quiet; then
             echo "Rien à committer — pas de changement de données."
           else
-            DIFF_SUMMARY=$(python - <<'EOF'
-import json, glob
+            # ── Écriture du script dans un fichier temporaire (évite le conflit <<'EOF' en YAML)
+            cat > /tmp/summarize.py << 'PYEOF'
+import json, glob, sys
 logs = sorted(glob.glob("logs/diff_*.json"))
 if logs:
     try:
@@ -69,8 +69,9 @@ if logs:
         print("Mise à jour des données")
 else:
     print("Mise à jour baseline")
-EOF
-)
+PYEOF
+
+            DIFF_SUMMARY=$(python /tmp/summarize.py)
             git commit -m "📊 $DIFF_SUMMARY"
             git pull origin main --rebase --autostash
             git push origin main
