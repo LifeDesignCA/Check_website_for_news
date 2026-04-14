@@ -58,21 +58,21 @@ jobs:
           else
             # ── Écriture du script dans un fichier temporaire (évite le conflit <<'EOF' en YAML)
             cat > /tmp/summarize.py << 'PYEOF'
-import json, glob, sys
-logs = sorted(glob.glob("logs/diff_*.json"))
-if logs:
-    try:
-        with open(logs[-1]) as f:
-            d = json.load(f)
-        print(f"[{d.get('date', 'N/A')}] +{len(d.get('nouveaux', []))} nouveau(x), -{len(d.get('supprimes', []))} supprimé(s), ~{len(d.get('modifies', []))} modifié(s)")
-    except Exception:
-        print("Mise à jour des données")
-else:
-    print("Mise à jour baseline")
-PYEOF
-
-            DIFF_SUMMARY=$(python /tmp/summarize.py)
-            git commit -m "📊 $DIFF_SUMMARY"
-            git pull origin main --rebase --autostash
-            git push origin main
-          fi
+            import json, glob, sys
+            logs = sorted(glob.glob("logs/diff_*.json"))
+            if logs:
+                try:
+                    with open(logs[-1]) as f:
+                        d = json.load(f)
+                    print(f"[{d.get('date', 'N/A')}] +{len(d.get('nouveaux', []))} nouveau(x), -{len(d.get('supprimes', []))} supprimé(s), ~{len(d.get('modifies', []))} modifié(s)")
+                except Exception:
+                    print("Mise à jour des données")
+            else:
+                print("Mise à jour baseline")
+            PYEOF
+            
+                        DIFF_SUMMARY=$(python /tmp/summarize.py)
+                        git commit -m "📊 $DIFF_SUMMARY"
+                        git pull origin main --rebase --autostash
+                        git push origin main
+                      fi
