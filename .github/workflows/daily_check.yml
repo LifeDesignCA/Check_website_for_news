@@ -33,18 +33,22 @@ jobs:
         env:
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          # Assure-toi que ton secret contient les emails séparés par des virgules
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
         run: python check_changes.py
 
-      - name: Commit changes
+      - name: Commit and Push changes
         run: |
           git config user.name "liliskane-bot"
-          git config user.email "bot@liliskane-monitor"
+          git config user.email "bot@lifedesign.ca"
           mkdir -p data logs
           git add data/ logs/
+          
           if git diff --cached --quiet; then
-            echo "Pas de changements."
+            echo "Pas de changements à committer."
           else
             git commit -m "📊 Mise à jour des données Liliskane"
-            git push
+            # Synchronisation avant le push pour éviter l'erreur (non-fast-forward)
+            git pull origin main --rebase
+            git push origin main
           fi
