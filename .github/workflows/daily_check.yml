@@ -41,17 +41,24 @@ jobs:
         run: |
           git config user.name "liliskane-bot"
           git config user.email "bot@lifedesign.ca"
-      
-          mkdir -p data logs
-      
-          # 1️⃣ récupérer les changements distants d'abord
-          git pull origin main --rebase
-      
-          # 2️⃣ ajouter les fichiers
-          git add data/ logs/
-      
-          # 3️⃣ commit seulement si changements
+          
+          # 1. On force l'ajout de tous les nouveaux fichiers (CSV et JSON)
+          git add -A
+          
+          # 2. On vérifie s'il y a vraiment des changements à envoyer
           if git diff --cached --quiet; then
+            echo "Rien à enregistrer aujourd'hui."
+          else
+            # 3. On crée le commit localement
+            git commit -m "📊 Mise à jour des données Liliskane"
+            
+            # 4. LE FIX : On synchronise avec le serveur en mode 'autostash'
+            # Cela met de côté les fichiers temporaires, fusionne, et remet tout en place
+            git pull origin main --rebase --autostash
+            
+            # 5. On envoie enfin les fichiers sur ton dépôt
+            git push origin main
+          fi
             echo "Aucun changement à enregistrer."
           else
             git commit -m "📊 Mise à jour des données Liliskane"
