@@ -200,43 +200,37 @@ def _build_html(diff: dict) -> str:
     """
 
 
+
+
 def envoyer_email(diff: dict) -> None:
     sender    = os.environ["EMAIL_SENDER"]
     password  = os.environ["EMAIL_PASSWORD"]
-    recipient = os.environ["EMAIL_RECIPIENT"]
+    # 1. On récupère la chaîne (ex: "mail1@test.com, mail2@test.com") 
+    # et on la transforme en liste réelle
+    raw_recipients = os.environ.get("EMAIL_RECIPIENT", "")
+    recipients = [r.strip() for r in raw_recipients.split(",") if r.strip()]
+    
     host      = os.environ.get("SMTP_HOST", "smtp.gmail.com")
     port      = int(os.environ.get("SMTP_PORT", 587))
 
-    n = len(diff["nouveaux"]) + len(diff["supprimes"]) + len(diff["modifies"])
-    subject = f"[Liliskane] {n} changement(s) détecté(s) le {diff['date']}"
+    # ... (le reste de votre logique de sujet et corps reste identique)
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = sender
-    msg["To"]      = recipient
+    # 2. IMPORTANT : Le champ "To" doit être une seule chaîne de caractères séparée par des virgules
+    msg["To"]      = ", ".join(recipients)
 
-    # Version texte brut (fallback)
-    txt = (
-        f"Rapport Liliskane — {diff['date']}\n"
-        f"Nouveaux   : {len(diff['nouveaux'])}\n"
-        f"Supprimés  : {len(diff['supprimes'])}\n"
-        f"Modifiés   : {len(diff['modifies'])}\n\n"
-        + "\n".join(
-            f"[MOD] {m['projet']} ({m['ville']}) — "
-            + ", ".join(f"{c}: {v['avant']} → {v['apres']}" for c, v in m["champs"].items())
-            for m in diff["modifies"]
-        )
-    )
-    msg.attach(MIMEText(txt, "plain", "utf-8"))
-    msg.attach(MIMEText(_build_html(diff), "html", "utf-8"))
+    # ... (attachement du texte et HTML)
 
     with smtplib.SMTP(host, port) as smtp:
         smtp.ehlo()
         smtp.starttls()
         smtp.login(sender, password)
-        smtp.sendmail(sender, recipient, msg.as_string())
+        # 3. On passe la LISTE complète ici
+        smtp.sendmail(sender, recipients, msg.as_string())
 
-    print(f"📧  Email envoyé à {recipient}")
+    print(f"📧 Email envoyé à {len(recipients)} destinataire(s)")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
