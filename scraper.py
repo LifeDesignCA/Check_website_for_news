@@ -195,199 +195,199 @@ def scrape_liliskane() -> list[dict]:
 #  SCRAPER 2 — AL OMRANE
 # ══════════════════════════════════════════════════════════════════════════════
 
-_OMRANE_BASE      = "https://www.alomrane.gov.ma"
-_OMRANE_LIST_URL  = _OMRANE_BASE + "/Nos-produits/Projets"
-_OMRANE_MAX_PAGES = 50   # le site affiche 600 projets ÷ 12/page = 50 pages
+# _OMRANE_BASE      = "https://www.alomrane.gov.ma"
+# _OMRANE_LIST_URL  = _OMRANE_BASE + "/Nos-produits/Projets"
+# _OMRANE_MAX_PAGES = 50   # le site affiche 600 projets ÷ 12/page = 50 pages
 
 
-def _omrane_parse_listing_page(soup: BeautifulSoup, seen_urls: set) -> list[dict]:
-    """
-    Extrait les cartes-projets d'une page de liste Al Omrane.
+# def _omrane_parse_listing_page(soup: BeautifulSoup, seen_urls: set) -> list[dict]:
+#     """
+#     Extrait les cartes-projets d'une page de liste Al Omrane.
 
-    Structure HTML observée (rendu) :
-      [Badge optionnel : Nouveau / Aide au logement / Promotion / Remise]
-      [img]
-      VILLE
-      <h3>NOM DU PROJET</h3>
-      description courte...
-      <a href="/Notre-reseau/...">Plus d'infos</a>
-    """
-    projects = []
+#     Structure HTML observée (rendu) :
+#       [Badge optionnel : Nouveau / Aide au logement / Promotion / Remise]
+#       [img]
+#       VILLE
+#       <h3>NOM DU PROJET</h3>
+#       description courte...
+#       <a href="/Notre-reseau/...">Plus d'infos</a>
+#     """
+#     projects = []
 
-    # Tous les liens "Plus d'infos" qui pointent vers une page de projet
-    info_links = soup.find_all(
-        "a",
-        href=re.compile(r"/Notre-reseau/", re.IGNORECASE),
-        string=re.compile(r"Plus d'infos", re.IGNORECASE),
-    )
+#     # Tous les liens "Plus d'infos" qui pointent vers une page de projet
+#     info_links = soup.find_all(
+#         "a",
+#         href=re.compile(r"/Notre-reseau/", re.IGNORECASE),
+#         string=re.compile(r"Plus d'infos", re.IGNORECASE),
+#     )
 
-    for link in info_links:
-        href = link.get("href", "")
-        if not href:
-            continue
-        detail_url = href if href.startswith("http") else _OMRANE_BASE + href
+#     for link in info_links:
+#         href = link.get("href", "")
+#         if not href:
+#             continue
+#         detail_url = href if href.startswith("http") else _OMRANE_BASE + href
 
-        if detail_url in seen_urls:
-            continue
-        seen_urls.add(detail_url)
+#         if detail_url in seen_urls:
+#             continue
+#         seen_urls.add(detail_url)
 
-        # Remonter au conteneur parent de la carte
-        card = link.parent
-        for _ in range(5):           # max 5 niveaux vers le haut
-            if card is None:
-                break
-            h3 = card.find("h3")
-            if h3:
-                break
-            card = card.parent
+#         # Remonter au conteneur parent de la carte
+#         card = link.parent
+#         for _ in range(5):           # max 5 niveaux vers le haut
+#             if card is None:
+#                 break
+#             h3 = card.find("h3")
+#             if h3:
+#                 break
+#             card = card.parent
 
-        if card is None:
-            continue
+#         if card is None:
+#             continue
 
-        # Nom du projet
-        h3 = card.find("h3")
-        nom = h3.get_text(strip=True) if h3 else "N/A"
+#         # Nom du projet
+#         h3 = card.find("h3")
+#         nom = h3.get_text(strip=True) if h3 else "N/A"
 
-        # Ville — texte brut précédant le h3 dans le conteneur
-        ville = "N/A"
-        if h3:
-            for node in h3.previous_siblings:
-                txt = ""
-                if hasattr(node, "get_text"):
-                    txt = node.get_text(separator=" ", strip=True)
-                elif isinstance(node, str):
-                    txt = node.strip()
-                # On exclut les balises images et les badges longs
-                if txt and len(txt) < 60 and not re.search(r"[<>]", txt):
-                    ville = txt
-                    break
+#         # Ville — texte brut précédant le h3 dans le conteneur
+#         ville = "N/A"
+#         if h3:
+#             for node in h3.previous_siblings:
+#                 txt = ""
+#                 if hasattr(node, "get_text"):
+#                     txt = node.get_text(separator=" ", strip=True)
+#                 elif isinstance(node, str):
+#                     txt = node.strip()
+#                 # On exclut les balises images et les badges longs
+#                 if txt and len(txt) < 60 and not re.search(r"[<>]", txt):
+#                     ville = txt
+#                     break
 
-        # Badge / Catégorie — chercher un span ou div badge dans la carte
-        badge = "N/A"
-        badge_patterns = [
-            "aide au logement", "nouveau", "promotion", "remise",
-        ]
-        card_text = card.get_text(separator=" ").lower()
-        for bp in badge_patterns:
-            if bp in card_text:
-                badge = bp.title()
-                break
+#         # Badge / Catégorie — chercher un span ou div badge dans la carte
+#         badge = "N/A"
+#         badge_patterns = [
+#             "aide au logement", "nouveau", "promotion", "remise",
+#         ]
+#         card_text = card.get_text(separator=" ").lower()
+#         for bp in badge_patterns:
+#             if bp in card_text:
+#                 badge = bp.title()
+#                 break
 
-        print(f"     ✔  {nom} | {ville} | {badge}")
+#         print(f"     ✔  {nom} | {ville} | {badge}")
 
-        projects.append({
-            "Source":         "Al Omrane",
-            "Nom du Projet":  nom,
-            "Ville":          ville,
-            "Catégorie":      badge,
-            "Statut":         "N/A",   # récupéré en détail si besoin
-            "Prix (DHS)":     "N/A",   # Al Omrane ne publie pas les prix en ligne
-            "Superficie Min": "N/A",
-            "Superficie Max": "N/A",
-            "Date de début":  "N/A",
-            "Lien":           detail_url,
-        })
+#         projects.append({
+#             "Source":         "Al Omrane",
+#             "Nom du Projet":  nom,
+#             "Ville":          ville,
+#             "Catégorie":      badge,
+#             "Statut":         "N/A",   # récupéré en détail si besoin
+#             "Prix (DHS)":     "N/A",   # Al Omrane ne publie pas les prix en ligne
+#             "Superficie Min": "N/A",
+#             "Superficie Max": "N/A",
+#             "Date de début":  "N/A",
+#             "Lien":           detail_url,
+#         })
 
-    return projects
-
-
-def _omrane_scrape_detail(url: str) -> dict:
-    """
-    Enrichit un projet Al Omrane avec les infos de sa page détail :
-      - Statut   (En cours / Livrable / Titres fonciers disponibles)
-      - Catégorie / badge précis
-      - Date de début si mentionnée dans la description
-    """
-    data = {"statut": "N/A", "date_debut": "N/A", "categorie": "N/A"}
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=15)
-        soup = BeautifulSoup(resp.content, "html.parser")
-        text = soup.get_text(separator="\n")
-
-        # Statut
-        for statut in ["En cours de travaux", "En cours", "Livrable",
-                       "Titres fonciers disponibles"]:
-            if statut.lower() in text.lower():
-                data["statut"] = statut
-                break
-
-        # Badge/catégorie (chercher dans les spans visibles)
-        for badge_kw in ["Aide au logement", "Nouveau", "Promotion", "Remise"]:
-            if badge_kw.lower() in text.lower():
-                data["categorie"] = badge_kw
-                break
-
-        # Date de début / lancement
-        for pat in [
-            r"[Dd]ate de lancement[^:]*[:\-]\s*([^\n]{4,30})",
-            r"[Dd]ate de d[ée]but[^:]*[:\-]\s*([^\n]{4,30})",
-            r"à partir du\s+([^\n]{4,25})",
-        ]:
-            m = re.search(pat, text)
-            if m:
-                data["date_debut"] = re.sub(r"\s+", " ", m.group(1)).strip()
-                break
-
-    except Exception as e:
-        print(f"    ⚠  Al Omrane détail {url} : {e}")
-    return data
+#     return projects
 
 
-def scrape_alomrane(fetch_details: bool = False) -> list[dict]:
-    """
-    Scrape tous les projets d'alomrane.gov.ma (600 projets / 50 pages).
+# def _omrane_scrape_detail(url: str) -> dict:
+#     """
+#     Enrichit un projet Al Omrane avec les infos de sa page détail :
+#       - Statut   (En cours / Livrable / Titres fonciers disponibles)
+#       - Catégorie / badge précis
+#       - Date de début si mentionnée dans la description
+#     """
+#     data = {"statut": "N/A", "date_debut": "N/A", "categorie": "N/A"}
+#     try:
+#         resp = requests.get(url, headers=HEADERS, timeout=15)
+#         soup = BeautifulSoup(resp.content, "html.parser")
+#         text = soup.get_text(separator="\n")
 
-    Args:
-        fetch_details: Si True, visite chaque page détail pour enrichir
-                       Statut, Catégorie précise et Date. Plus lent (~10 min).
-                       Si False (défaut), listing seulement — rapide (~30 sec).
-    """
-    all_projects = []
-    seen_urls    = set()
+#         # Statut
+#         for statut in ["En cours de travaux", "En cours", "Livrable",
+#                        "Titres fonciers disponibles"]:
+#             if statut.lower() in text.lower():
+#                 data["statut"] = statut
+#                 break
 
-    print("\n" + "─" * 50)
-    print("🏗️   SOURCE : Al Omrane")
-    print("─" * 50)
+#         # Badge/catégorie (chercher dans les spans visibles)
+#         for badge_kw in ["Aide au logement", "Nouveau", "Promotion", "Remise"]:
+#             if badge_kw.lower() in text.lower():
+#                 data["categorie"] = badge_kw
+#                 break
 
-    for page in range(1, _OMRANE_MAX_PAGES + 1):
-        url = f"{_OMRANE_LIST_URL}?pagelist={page}"
-        print(f"\n  📄  Page {page}/{_OMRANE_MAX_PAGES}  →  {url}")
-        try:
-            resp = requests.get(url, headers=HEADERS, timeout=20)
-            if resp.status_code != 200:
-                print(f"     ⚠  HTTP {resp.status_code} — arrêt de la pagination")
-                break
-            soup = BeautifulSoup(resp.content, "html.parser")
-        except Exception as e:
-            print(f"     ⚠  Erreur réseau page {page} : {e}")
-            time.sleep(2)
-            continue
+#         # Date de début / lancement
+#         for pat in [
+#             r"[Dd]ate de lancement[^:]*[:\-]\s*([^\n]{4,30})",
+#             r"[Dd]ate de d[ée]but[^:]*[:\-]\s*([^\n]{4,30})",
+#             r"à partir du\s+([^\n]{4,25})",
+#         ]:
+#             m = re.search(pat, text)
+#             if m:
+#                 data["date_debut"] = re.sub(r"\s+", " ", m.group(1)).strip()
+#                 break
 
-        page_projects = _omrane_parse_listing_page(soup, seen_urls)
+#     except Exception as e:
+#         print(f"    ⚠  Al Omrane détail {url} : {e}")
+#     return data
 
-        if not page_projects:
-            print(f"     ⚠  Aucun projet trouvé — fin de pagination à la page {page}")
-            break
 
-        # Enrichissement optionnel via la page détail
-        if fetch_details:
-            for proj in page_projects:
-                time.sleep(0.4)
-                detail = _omrane_scrape_detail(proj["Lien"])
-                if detail["statut"] != "N/A":
-                    proj["Statut"] = detail["statut"]
-                if detail["categorie"] != "N/A":
-                    proj["Catégorie"] = detail["categorie"]
-                if detail["date_debut"] != "N/A":
-                    proj["Date de début"] = detail["date_debut"]
+# def scrape_alomrane(fetch_details: bool = False) -> list[dict]:
+#     """
+#     Scrape tous les projets d'alomrane.gov.ma (600 projets / 50 pages).
 
-        all_projects.extend(page_projects)
+#     Args:
+#         fetch_details: Si True, visite chaque page détail pour enrichir
+#                        Statut, Catégorie précise et Date. Plus lent (~10 min).
+#                        Si False (défaut), listing seulement — rapide (~30 sec).
+#     """
+#     all_projects = []
+#     seen_urls    = set()
 
-        # Pause courtoise entre les pages
-        time.sleep(0.8)
+#     print("\n" + "─" * 50)
+#     print("🏗️   SOURCE : Al Omrane")
+#     print("─" * 50)
 
-    print(f"\n  ✅  Al Omrane : {len(all_projects)} projets récupérés")
-    return all_projects
+#     for page in range(1, _OMRANE_MAX_PAGES + 1):
+#         url = f"{_OMRANE_LIST_URL}?pagelist={page}"
+#         print(f"\n  📄  Page {page}/{_OMRANE_MAX_PAGES}  →  {url}")
+#         try:
+#             resp = requests.get(url, headers=HEADERS, timeout=20)
+#             if resp.status_code != 200:
+#                 print(f"     ⚠  HTTP {resp.status_code} — arrêt de la pagination")
+#                 break
+#             soup = BeautifulSoup(resp.content, "html.parser")
+#         except Exception as e:
+#             print(f"     ⚠  Erreur réseau page {page} : {e}")
+#             time.sleep(2)
+#             continue
+
+#         page_projects = _omrane_parse_listing_page(soup, seen_urls)
+
+#         if not page_projects:
+#             print(f"     ⚠  Aucun projet trouvé — fin de pagination à la page {page}")
+#             break
+
+#         # Enrichissement optionnel via la page détail
+#         if fetch_details:
+#             for proj in page_projects:
+#                 time.sleep(0.4)
+#                 detail = _omrane_scrape_detail(proj["Lien"])
+#                 if detail["statut"] != "N/A":
+#                     proj["Statut"] = detail["statut"]
+#                 if detail["categorie"] != "N/A":
+#                     proj["Catégorie"] = detail["categorie"]
+#                 if detail["date_debut"] != "N/A":
+#                     proj["Date de début"] = detail["date_debut"]
+
+#         all_projects.extend(page_projects)
+
+#         # Pause courtoise entre les pages
+#         time.sleep(0.8)
+
+#     print(f"\n  ✅  Al Omrane : {len(all_projects)} projets récupérés")
+#     return all_projects
 
 
 # ══════════════════════════════════════════════════════════════════════════════
