@@ -416,7 +416,6 @@ HEADERS = {
 
 _ADDOHA_BASE = "https://www.groupeaddoha.com/"
 
-# Pages candidates
 _ADDOHA_LISTING_CANDIDATES = [
     "/",
     "/ar/",
@@ -425,9 +424,10 @@ _ADDOHA_LISTING_CANDIDATES = [
 
 
 def _addoha_find_listing_url() -> str | None:
-    """Teste les URLs candidates pour trouver une page Addoha contenant des projets."""
-    
+    """Teste les URLs candidates pour trouver une page contenant des projets."""
+
     for path in _ADDOHA_LISTING_CANDIDATES:
+
         url = urljoin(_ADDOHA_BASE, path)
 
         try:
@@ -448,7 +448,6 @@ def _addoha_parse_page(soup: BeautifulSoup, seen_urls: set) -> list[dict]:
 
     projects = []
 
-    # Cherche tous les liens possibles vers projets
     links = soup.find_all("a", href=True)
 
     for link in links:
@@ -458,7 +457,11 @@ def _addoha_parse_page(soup: BeautifulSoup, seen_urls: set) -> list[dict]:
         if not href:
             continue
 
-        # Addoha utilise souvent ?projet=
+        # ignorer certains liens
+        if "mailto:" in href or "tel:" in href:
+            continue
+
+        # Addoha utilise ?projet=
         if "?projet=" not in href:
             continue
 
@@ -471,11 +474,21 @@ def _addoha_parse_page(soup: BeautifulSoup, seen_urls: set) -> list[dict]:
 
         card_text = link.get_text(separator=" ", strip=True)
 
-        # --- TITRE ---
         nom = card_text.strip()
 
+        # filtrer textes inutiles
+        invalid_titles = [
+            "هل لديك أي سؤال",
+            "اتصل بنا",
+            "contact",
+            "nous contacter",
+        ]
+
         if not nom or len(nom) < 3:
-            nom = "Projet Addoha"
+            continue
+
+        if any(x in nom.lower() for x in invalid_titles):
+            continue
 
         # --- VILLE ---
         ville = "N/A"
@@ -544,7 +557,6 @@ def scrape_addoha() -> list[dict]:
         print("  ⚠️  Erreur : Le site Addoha est inaccessible.")
         return []
 
-    # On limite à 5 pages
     for page in range(1, 6):
 
         page_url = listing_url if page == 1 else f"{listing_url}?paged={page}"
@@ -552,6 +564,7 @@ def scrape_addoha() -> list[dict]:
         print(f"  📄  Page {page}  →  {page_url}")
 
         try:
+
             resp = requests.get(page_url, headers=HEADERS, timeout=15)
 
             if resp.status_code != 200:
