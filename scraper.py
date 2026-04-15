@@ -405,94 +405,93 @@ def scrape_liliskane() -> list[dict]:
 #
 # ══════════════════════════════════════════════════════════════════════════════
 
+# --- CONFIGURATION ---
+# Ces headers simulent un humain pour éviter le blocage 403
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,ar;q=0.7',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Referer': 'https://www.groupeaddoha.com/',
+}
+
 _ADDOHA_BASE = "https://www.groupeaddoha.com/?page_id=7"
 
-# URLs à tester dans l'ordre — le premier qui répond avec des projets est utilisé
+# On cible les pages de recherche et les versions arabes
 _ADDOHA_LISTING_CANDIDATES = [
-    "/projets",
-    "/nos-projets",
-    "/immobilier",
-    "/offres",
-    "/programmes",
+    "/recherche/",
+    "/ar/recherche/",
+    "/?page_id=7", # Ton URL d'origine (fallback)
+    "/?s=",        # Recherche vide pour tout lister
 ]
-
 
 def _addoha_find_listing_url() -> str | None:
     """Teste les URLs candidates pour trouver la page de listing Addoha."""
     for path in _ADDOHA_LISTING_CANDIDATES:
         url = _ADDOHA_BASE + path
         try:
-            resp = requests.get(url, headers=HEADERS, timeout=10)
+            resp = requests.get(url, headers=HEADERS, timeout=15)
+            # On vérifie si la page contient du contenu réel (plus de 5000 octets)
             if resp.status_code == 200 and len(resp.content) > 5000:
-                print(f"     ✔  URL Addoha trouvée : {url}")
+                print(f"      ✔ URL Addoha fonctionnelle trouvée : {url}")
                 return url
         except Exception:
-            pass
+            continue
     return None
 
-
 def _addoha_parse_page(soup: BeautifulSoup, seen_urls: set) -> list[dict]:
-    """
-    Tente d'extraire les cartes-projets Addoha.
-    Stratégie générique : cherche les liens de détail projet puis remonte.
-
-    À ajuster selon la structure réelle du site une fois accessible.
-    """
+    """Extrait les projets de la page, gère l'arabe et le français."""
     projects = []
+    
+    # Addoha utilise souvent des balises <article> ou des div avec ces classes
+    cards = soup.find_all(["article", "div"], class_=re.compile(r"(post|item|project|card|product|entry)", re.IGNORECASE))
 
-    # Stratégie 1 : liens contenant /projet/ ou /programme/ ou /residence/
-    candidate_links = soup.find_all(
-        "a",
-        href=re.compile(r"/(projet|programme|residence|logement|bien)/", re.IGNORECASE),
-    )
+    # Si rien n'est trouvé, on cherche tous les liens qui ont l'air d'être des projets
+    if not cards:
+        cards = soup.find_all("a", href=re.compile(r"/(projet|programme|residence|logement|bien|ar/)/", re.IGNORECASE))
 
-    # Stratégie 2 si rien trouvé : tous liens internes avec une image h3
-    if not candidate_links:
-        candidate_links = [
-            a for a in soup.find_all("a", href=True)
-            if a.find("h3") or a.find("h2")
-        ]
-
-    for link in candidate_links:
+    for card in cards:
+        link = card if card.name == "a" else card.find("a", href=True)
+        if not link: continue
+        
         href = link.get("href", "")
-        if not href:
-            continue
+        if not href or href in ["#", ""]: continue
+        
         detail_url = href if href.startswith("http") else _ADDOHA_BASE + href
-
-        if detail_url in seen_urls:
-            continue
+        if detail_url in seen_urls: continue
         seen_urls.add(detail_url)
 
-        # Titre du projet
-        h = link.find(["h3", "h2", "h4"])
+        # Extraction du texte global de la carte pour la ville et le prix
+        card_text = card.get_text(separator=" ", strip=True)
+        
+        # --- TITRE ---
+        h = card.find(["h2", "h3", "h4", "span"], class_=re.compile(r"(title|name|nom)", re.IGNORECASE))
         nom = h.get_text(strip=True) if h else link.get_text(strip=True)
-        if not nom or len(nom) < 3:
-            continue
+        if not nom or len(nom) < 3: continue
 
-        # Ville — chercher un texte court dans la carte
+        # --- VILLE (Mapping FR/AR) ---
         ville = "N/A"
-        card = link.parent
-        card_text = card.get_text(separator="\n") if card else ""
-        # Recherche d'une ville connue au Maroc dans le texte de la carte
-        villes_maroc = [
-            "Casablanca", "Rabat", "Marrakech", "Agadir", "Tanger", "Fès",
-            "Meknès", "Oujda", "Salé", "Tétouan", "Kénitra", "Temara",
-            "Mohammedia", "Settat", "Laayoune", "Dakhla", "Nador", "Beni Mellal",
-        ]
-        for v in villes_maroc:
-            if v.lower() in card_text.lower():
-                ville = v
+        villes_dict = {
+            "Casablanca": ["Casablanca", "الدار البيضاء"],
+            "Marrakech": ["Marrakech", "مراكش"],
+            "Rabat": ["Rabat", "الرباط"],
+            "Tanger": ["Tanger", "طنجة"],
+            "Agadir": ["Agadir", "أكادير"],
+            "Fès": ["Fès", "فاس"],
+            "Oujda": ["Oujda", "وجدة"],
+            "Tétouan": ["Tétouan", "تطوان"]
+        }
+        for fr_name, variations in villes_dict.items():
+            if any(v.lower() in card_text.lower() for v in variations):
+                ville = fr_name
                 break
 
-        # Prix — chercher un pattern DH / DHS / MAD dans la carte
+        # --- PRIX (Pattern FR et AR) ---
         prix = "N/A"
-        prix_match = re.search(
-            r"([\d\s]{3,}(?:DH|DHS|MAD|dirhams?))", card_text, re.IGNORECASE
-        )
+        # Cherche chiffres + DH ou le mot arabe درهم
+        prix_match = re.search(r"([\d\s\.]+(?:DH|DHS|MAD|درهم))", card_text, re.IGNORECASE)
         if prix_match:
-            prix = re.sub(r"\s+", " ", prix_match.group(1).strip())
-
-        print(f"     ✔  {nom} | {ville} | {prix}")
+            prix = prix_match.group(1).replace("درهم", "DHS").strip()
+            prix = re.sub(r"\s+", " ", prix)
 
         projects.append({
             "Source":         "Addoha",
@@ -506,18 +505,12 @@ def _addoha_parse_page(soup: BeautifulSoup, seen_urls: set) -> list[dict]:
             "Date de début":  "N/A",
             "Lien":           detail_url,
         })
+        print(f"      ✔  {nom[:30]}... | {ville} | {prix}")
 
     return projects
 
-
 def scrape_addoha() -> list[dict]:
-    """
-    Scrape les projets de groupeaddoha.com.
-
-    ⚠️  Le site était inaccessible lors du développement.
-    Ce scraper retourne [] si le site est toujours indisponible,
-    sans bloquer les autres sources.
-    """
+    """Scrapeur principal pour Addoha."""
     all_projects = []
     seen_urls    = set()
 
@@ -525,40 +518,39 @@ def scrape_addoha() -> list[dict]:
     print("🏢  SOURCE : Groupe Addoha")
     print("─" * 50)
 
-    # Tenter de trouver l'URL de listing
     listing_url = _addoha_find_listing_url()
     if not listing_url:
-        print("  ⚠️  groupeaddoha.com est inaccessible — source ignorée pour cette exécution.")
-        print("      Vérifiez l'URL correcte sur https://www.groupeaddoha.com")
-        print("      et mettez à jour _ADDOHA_LISTING_CANDIDATES dans scraper.py")
+        print("  ⚠️  Erreur : Le site Addoha est inaccessible (Bloqué ou URL changée).")
         return []
 
-    # Pagination : on tente jusqu'à 20 pages ou jusqu'à ce qu'une page soit vide
-    for page in range(1, 21):
-        # Essayer différents formats de pagination
-        page_url = listing_url if page == 1 else f"{listing_url}?page={page}"
-        print(f"\n  📄  Page {page}  →  {page_url}")
+    # On limite à 5 pages pour éviter d'être banni trop vite
+    for page in range(1, 6):
+        # Format WordPress standard pour la pagination
+        page_url = listing_url if page == 1 else f"{listing_url}page/{page}/"
+        
+        print(f"  📄  Page {page}  →  {page_url}")
         try:
             resp = requests.get(page_url, headers=HEADERS, timeout=15)
             if resp.status_code != 200:
-                print(f"     ⚠  HTTP {resp.status_code} — fin de pagination")
+                print(f"     ⚠ Fin de pagination (HTTP {resp.status_code})")
                 break
+            
             soup = BeautifulSoup(resp.content, "html.parser")
+            page_projects = _addoha_parse_page(soup, seen_urls)
+            
+            if not page_projects:
+                print("     ⚠ Aucun projet sur cette page.")
+                break
+                
+            all_projects.extend(page_projects)
+            time.sleep(1.5) # Pause pour la sécurité
+            
         except Exception as e:
-            print(f"     ⚠  Erreur réseau : {e}")
+            print(f"     ⚠ Erreur lors du scrap : {e}")
             break
-
-        page_projects = _addoha_parse_page(soup, seen_urls)
-        if not page_projects:
-            print("     ⚠  Aucun projet trouvé — fin de pagination")
-            break
-
-        all_projects.extend(page_projects)
-        time.sleep(0.7)
 
     print(f"\n  ✅  Addoha : {len(all_projects)} projets récupérés")
     return all_projects
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  POINT D'ENTRÉE UNIFIÉ
