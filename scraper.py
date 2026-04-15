@@ -407,109 +407,91 @@ def scrape_liliskane() -> list[dict]:
 
 # --- CONFIGURATION ---
 # Ces headers simulent un humain pour éviter le blocage 403
-
-HEADERS = { 
-    "User-Agent": "Mozilla/5.0",
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,ar;q=0.7",
 }
 
 _ADDOHA_BASE = "https://www.groupeaddoha.com/?page_id=7"
 
-# pages où se trouvent les cartes projets
-_ADDOHA_LISTING_CANDIDATES = [
-    "/",
-]
-
-
-
 def _addoha_find_listing_url():
-
     try:
-
         r = requests.get(_ADDOHA_BASE, headers=HEADERS, timeout=15)
-
         if r.status_code == 200:
             print(f"      ✔ URL Addoha fonctionnelle trouvée : {_ADDOHA_BASE}")
             return r.text
-
-    except Exception:
-
-        pass
-
+    except Exception as e:
+        print(f"Erreur lors de l'accès à la page liste : {e}")
     return None
 
-
 def _extract_project_links(html):
-
     """Trouve tous les liens projet"""
-
     soup = BeautifulSoup(html, "html.parser")
-
     links = set()
-
+    # On cherche les liens de type ?projet=X
     for a in soup.find_all("a", href=True):
-
         href = a["href"]
-
         if "?projet=" in href:
-
             links.add(urljoin(_ADDOHA_BASE, href))
-
     return list(links)
 
-
 def _parse_addoha_project(url):
-    """Scrape une page projet avec une détection de ville plus précise"""
+    """Scrape une page projet avec une détection par score pour la ville"""
     try:
         r = requests.get(url, headers=HEADERS, timeout=15)
         soup = BeautifulSoup(r.content, "html.parser")
         
-        # On cible uniquement la partie "Contenu" pour éviter le footer/menu
-        # Addoha utilise souvent 'main' ou des classes spécifiques pour le corps de page
-        content_area = soup.find("main") or soup.find("div", {"id": "content"}) or soup
-        text = content_area.get_text(" ", strip=True)
+        # On cible le corps de la page pour éviter le menu/footer
+        content_area = soup.find("main") or soup.find("article") or soup.find("div", {"id": "content"}) or soup
+        text_full = content_area.get_text(" ", strip=True)
 
-        # NOM
+        # NOM DU PROJET (H1 est le plus fiable)
         title = soup.find("h1")
         nom = title.get_text(strip=True) if title else "Projet Addoha"
 
-        # VILLE (Mapping amélioré)
+        # --- VILLE (Stratégie par score pour éviter les erreurs) ---
         ville = "N/A"
-        villes = {
-            "Tanger": "طنجة",
-            "Marrakech": "مراكش",
-            "Rabat": "الرباط",
-            "Agadir": "أكادير",
-            "Fès": "فاس",
-            "Oujda": "وجدة",
-            "Tétouan": "تطوان",
-            "Meknès": "مكناس",
-            "Salé": "سلا",
-            "Casablanca": "الدار البيضاء", # On le met à la fin pour qu'il ne soit pas prioritaire
+        ville_scores = {}
+        villes_dict = {
+            "Marrakech": ["مراكش", "Marrakech"],
+            "Oujda": ["وجدة", "Oujda"],
+            "Tanger": ["طنجة", "Tanger"],
+            "Rabat": ["الرباط", "Rabat"],
+            "Agadir": ["أكادير", "Agadir"],
+            "Fès": ["فاس", "Fès"],
+            "Tétouan": ["تطوان", "Tétouan"],
+            "Meknès": ["مكناس", "Meknès"],
+            "Salé": ["سلا", "Salé"],
+            "Casablanca": ["الدار البيضاء", "Casablanca"],
         }
 
-        # ASTUCE : On cherche d'abord dans le titre ou les balises de localisation
-        location_tag = soup.find(class_=re.compile(r"location|city|breadcrumb", re.IGNORECASE))
-        location_text = location_tag.get_text() if location_tag else ""
-
-        for fr, ar in villes.items():
-            # Si la ville est dans le petit texte de localisation (plus précis)
-            if ar in location_text:
+        # On cherche d'abord dans le titre du projet (très fiable)
+        nom_lower = nom.lower()
+        for fr, variations in villes_dict.items():
+            if any(var.lower() in nom_lower or var in nom for var in variations):
                 ville = fr
                 break
-        
-        # Si on n'a toujours rien trouvé, on cherche dans le texte principal
-        if ville == "N/A":
-            for fr, ar in villes.items():
-                if ar in text:
-                    ville = fr
-                    break
 
-        # PRIX
+        # Si pas trouvé dans le titre, on compte les points dans le texte
+        if ville == "N/A":
+            text_lower = text_full.lower()
+            for fr, variations in villes_dict.items():
+                score = 0
+                for var in variations:
+                    score += text_lower.count(var.lower())
+                if score > 0:
+                    ville_scores[fr] = score
+            
+            if ville_scores:
+                # La ville qui apparaît le plus gagne
+                ville = max(ville_scores, key=ville_scores.get)
+
+        # --- PRIX ---
         prix = "N/A"
-        # Regex plus robuste pour les prix marocains
-        prix_match = re.search(r"([\d\.\s]{3,})\s*درهم", text)
+        # Cherche les chiffres suivis de درهم ou DH
+        prix_match = re.search(r"([\d\.\s]{3,})\s*(درهم|DH|DHS)", text_full, re.IGNORECASE)
         if prix_match:
+            # Nettoyage : on enlève les points et espaces pour avoir un nombre pur
             prix = prix_match.group(1).replace(".", "").replace(" ", "").strip()
 
         return {
@@ -529,43 +511,31 @@ def _parse_addoha_project(url):
         print(f"Erreur sur {url}: {e}")
         return None
 
-
 def scrape_addoha():
-
     all_projects = []
-
     print("\n" + "─" * 50)
     print("🏢  SOURCE : Groupe Addoha")
     print("─" * 50)
 
     html = _addoha_find_listing_url()
-
     if not html:
-
         print("⚠ Addoha inaccessible")
-
         return []
 
     project_links = _extract_project_links(html)
+    print(f"🔍 {len(project_links)} projets détectés sur la page liste...")
 
     for link in project_links:
-
         project = _parse_addoha_project(link)
-
         if project:
-
             all_projects.append(project)
-
-            print(
-                f"      ✔ {project['Nom du Projet']} | {project['Ville']} | {project['Prix (DHS)']}"
-            )
-
+            print(f"      ✔ {project['Nom du Projet'][:25]} | {project['Ville']} | {project['Prix (DHS)']} DH")
+        
+        # Pause pour ne pas être banni par le serveur
         time.sleep(1)
 
     print(f"\n  ✅ Addoha : {len(all_projects)} projets récupérés")
-
     return all_projects
-
 # ══════════════════════════════════════════════════════════════════════════════
 #  POINT D'ENTRÉE UNIFIÉ
 # ══════════════════════════════════════════════════════════════════════════════
