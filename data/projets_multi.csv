@@ -1,68 +1,0 @@
-﻿Source;Nom du Projet;Ville;Catégorie;Statut;Prix (DHS);Superficie Min;Superficie Max;Date de début;Lien
-Liliskane;Assafa;Had Soualem;Économique;N/A;250 000 DHS;55 m²;65 m²;N/A;https://www.liliskane.com/projet/180/assafa
-Liliskane;Al Yassamine;Agadir;Moyen Standing;N/A;504 000 DHS;77 m²;142 m²;N/A;https://www.liliskane.com/projet/77/al-yassamine
-Liliskane;Al Anbra;Agadir;Moyen Standing;N/A;903 000 DHS;97 m²;111 m²;N/A;https://www.liliskane.com/projet/210/al-anbra
-Liliskane;Tulipe;Casablanca;Moyen Standing;N/A;594 000 DHS;68 m²;157 m²;N/A;https://www.liliskane.com/projet/162/tulipe
-Liliskane;Assalam TG;Casablanca;Moyen Standing;N/A;1 370 000 DHS;179 m²;213 m²;N/A;https://www.liliskane.com/projet/72/assalam-tg
-Liliskane;Massylia;Agadir;Moyen Standing;N/A;865 000 DHS;65 m²;96 m²;N/A;https://www.liliskane.com/projet/186/massylia
-Liliskane;Les Pins de Maamora;Casablanca;Moyen Standing;N/A;850 000 DHS;72 m²;97 m²;N/A;https://www.liliskane.com/projet/79/les-pins-de-maamora
-Liliskane;Bougainvillier;Casablanca;Moyen Standing;N/A;700 000 DHS;70 m²;155 m²;N/A;https://www.liliskane.com/projet/160/bougainvillier
-Liliskane;Dyar Al Bahia;Temara;Moyen Standing;N/A;504 000 DHS;54 m²;80 m²;N/A;https://www.liliskane.com/projet/161/dyar-al-bahia
-Liliskane;Jasmin;Casablanca;Moyen Standing;N/A;700 000 DHS;70 m²;154 m²;N/A;https://www.liliskane.com/projet/179/jasmin
-Liliskane;Jnane Souss;Agadir;Moyen Standing;N/A;745 000 DHS;71 m²;94 m²;N/A;https://www.liliskane.com/projet/188/jnane-souss
-Liliskane;Al Anbar;Casablanca;Moyen Standing;N/A;505 000 DHS;57 m²;122 m²;N/A;https://www.liliskane.com/projet/189/al-anbar
-Liliskane;Izdihar;Agadir;Moyen Standing;N/A;445 000 DHS;48 m²;92 m²;N/A;https://www.liliskane.com/projet/218/izdihar
-Liliskane;Riad Garden I;Casablanca;Haut Standing;N/A;2 156 000 DHS;89 m²;190 m²;N/A;https://www.liliskane.com/projet/95/riad-garden-i
-Liliskane;Patio Verde;Agadir;Haut Standing;N/A;580 000 DHS;45 m²;142 m²;N/A;https://www.liliskane.com/projet/192/patio-verde
-Liliskane;Riad Garden II;Casablanca;Haut Standing;N/A;1 830 000 DHS;84 m²;116 m²;N/A;https://www.liliskane.com/projet/209/riad-garden-ii
-Liliskane;Al Araâr;Agadir;Haut Standing;N/A;1 356 000 DHS;179 m²;287 m²;N/A;https://www.liliskane.com/projet/94/al-araar
-Liliskane;Océane;Casablanca;Haut Standing;N/A;1 962 000 DHS;151 m²;151 m²;N/A;https://www.liliskane.com/projet/190/oceane
-Liliskane;Amaïa;Casablanca;Haut Standing;N/A;1 130 000 DHS;72 m²;110 m²;N/A;https://www.liliskane.com/projet/211/amaia
-Liliskane;Océane R+1;Casablanca;Lots de terrains;N/A;4 500 DHS;168 m²;379 m²;N/A;https://www.liliskane.com/projet/191/oceane-r-1
-Liliskane;Al Maamora R+1;Casablanca;Lots de terrains;N/A;4 600 DHS;474 m²;618 m²;N/A;https://www.liliskane.com/projet/143/al-maamora-r-1
-Liliskane;Al Araâr R+1;Agadir;Lots de terrains;N/A;4 200 DHS;162 m²;248 m²;N/A;https://www.liliskane.com/projet/148/al-araar-r-1
-Liliskane;Al Youssoufia R+2;Had Soualem;Lots de terrains;N/A;3 450 DHS;120 m²;140 m²;N/A;https://www.liliskane.com/projet/175/al-youssoufia-r-2
-Liliskane;Al Youssoufia R+3;Had Soualem;Lots de terrains;N/A;4 945 DHS;147 m²;173 m²;N/A;https://www.liliskane.com/projet/176/al-youssoufia-r-3
-Addoha;التوحيد 2;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%aa%d9%88%d8%ad%d9%8a%d8%af-2
-Addoha;‬الوحدة;Casablanca;N/A;N/A;370000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%88%d8%ad%d8%af%d8%a9-2
-Addoha;ڤال فلوري;Casablanca;N/A;N/A;750000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%da%a4%d8%a7%d9%84-%d9%81%d9%84%d9%88%d8%b1%d9%8a
-Addoha;اليـــاقوت;Casablanca;N/A;N/A;380000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%8a%d9%80%d9%80%d9%80%d8%a7%d9%82%d9%88%d8%aa
-Addoha;أبراج منارة 2;Casablanca;N/A;N/A;750000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a3%d8%a8%d8%b1%d8%a7%d8%ac-%d9%85%d9%86%d8%a7%d8%b1%d8%a9-2
-Addoha;الصفاء;Casablanca;N/A;N/A;220000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%b5%d9%81%d8%a7%d8%a1
-Addoha;حدائق الرحمة;Casablanca;N/A;N/A;70000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%ad%d8%af%d8%a7%d8%a6%d9%82-%d8%a7%d9%84%d8%b1%d8%ad%d9%85%d8%a9
-Addoha;الفجر;Casablanca;N/A;N/A;200000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%81%d8%ac%d8%b1
-Addoha;التيسير;Casablanca;N/A;N/A;225000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%aa%d9%8a%d8%b3%d9%8a%d8%b1
-Addoha;البهجة;Casablanca;N/A;N/A;420000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a8%d9%87%d8%ac%d8%a9
-Addoha;المنصور;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%85%d9%86%d8%b5%d9%88%d8%b1
-Addoha;سيتي النزهة;Casablanca;N/A;N/A;700000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%b3%d9%8a%d8%aa%d9%8a-%d8%a7%d9%84%d9%86%d8%b2%d9%87%d8%a9
-Addoha;تولال;Casablanca;N/A;N/A;1400000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%aa%d9%88%d9%84%d8%a7%d9%84
-Addoha;الابرار مديونة;Casablanca;N/A;N/A;240000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a7%d8%a8%d8%b1%d8%a7%d8%b1-%d9%85%d8%af%d9%8a%d9%88%d9%86%d8%a9
-Addoha;النصر;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%86%d8%b5%d8%b1
-Addoha;النور;Casablanca;N/A;N/A;430000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%86%d9%88%d8%b1
-Addoha;الفردوس;Casablanca;N/A;N/A;70000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%81%d8%b1%d8%af%d9%88%d8%b3
-Addoha;حدائق وجدة;Casablanca;N/A;N/A;70000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%ad%d8%af%d8%a7%d8%a6%d9%82-%d9%88%d8%ac%d8%af%d8%a9
-Addoha;البدر تيط مليل;Casablanca;N/A;N/A;156000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a8%d8%af%d8%b1-%d8%aa%d9%8a%d8%b7-%d9%85%d9%84%d9%8a%d9%84
-Addoha;الأزهر;Casablanca;N/A;N/A;470000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a3%d8%b2%d9%87%d8%b1
-Addoha;سلمى;Casablanca;N/A;N/A;230000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%b3%d9%84%d9%85%d9%89
-Addoha;المرجان;Casablanca;N/A;N/A;180000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%85%d8%b1%d8%ac%d8%a7%d9%86
-Addoha;سابل دور;Casablanca;N/A;N/A;230000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%b3%d8%a7%d8%a8%d9%84-%d8%af%d9%88%d8%b1
-Addoha;الفتح;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%81%d8%aa%d8%ad
-Addoha;الراحة;Casablanca;N/A;N/A;380000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%b1%d8%a7%d8%ad%d8%a9
-Addoha;إقامات الڭولف;Casablanca;N/A;N/A;140000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a5%d9%82%d8%a7%d9%85%d8%a7%d8%aa-%d8%a7%d9%84%da%ad%d9%88%d9%84%d9%81
-Addoha;أبراج منارة 1;Casablanca;N/A;N/A;390000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a3%d8%a8%d8%b1%d8%a7%d8%ac-%d9%85%d9%86%d8%a7%d8%b1%d8%a9-1
-Addoha;عرصة الزيتون;Casablanca;N/A;N/A;120000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%b9%d8%b1%d8%b5%d8%a9-%d8%a7%d9%84%d8%b2%d9%8a%d8%aa%d9%88%d9%86
-Addoha;أشقار;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a3%d8%b4%d9%82%d8%a7%d8%b1
-Addoha;الحديقة;Casablanca;N/A;N/A;0001280;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%ad%d8%af%d9%8a%d9%82%d8%a9
-Addoha;الزهور;Casablanca;N/A;N/A;100000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%b2%d9%87%d9%88%d8%b1
-Addoha;زهور تاركة;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%b2%d9%87%d9%88%d8%b1-%d8%aa%d8%a7%d8%b1%d9%83%d8%a9
-Addoha;أبواب مراكش;Casablanca;N/A;N/A;515000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a3%d8%a8%d9%88%d8%a7%d8%a8-%d9%85%d8%b1%d8%a7%d9%83%d8%b4
-Addoha;الإيمان;Casablanca;N/A;N/A;200000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a5%d9%8a%d9%85%d8%a7%d9%86
-Addoha;وسلان;Casablanca;N/A;N/A;120000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d9%88%d8%b3%d9%84%d8%a7%d9%86
-Addoha;حدائق تاركة;Casablanca;N/A;N/A;N/A;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%ad%d8%af%d8%a7%d8%a6%d9%82-%d8%aa%d8%a7%d8%b1%d9%83%d8%a9
-Addoha;;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%8a%d8%a7%d8%b3%d9%85%d9%8a%d9%86
-Addoha;الأمل;Casablanca;N/A;N/A;190000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a3%d9%85%d9%84
-Addoha;المهد;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%85%d9%87%d8%af
-Addoha;الأصيل;Casablanca;N/A;N/A;180000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a3%d8%b5%d9%8a%d9%84
-Addoha;التوحيد;Casablanca;N/A;N/A;250000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%aa%d9%88%d8%ad%d9%8a%d8%af
-Addoha;المستقبل;Casablanca;N/A;N/A;10000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d9%85%d8%b3%d8%aa%d9%82%d8%a8%d9%84
-Addoha;نور ليساسفة;Casablanca;N/A;N/A;70000;N/A;N/A;N/A;https://www.groupeaddoha.com/?projet=%d9%86%d9%88%d8%b1-%d9%84%d9%8a%d8%b3%d8%a7%d8%b3%d9%81%d8%a9
