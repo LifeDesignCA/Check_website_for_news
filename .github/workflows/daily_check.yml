@@ -1,78 +1,53 @@
-name: 🏠 Liliskane Daily Monitor
+name: Liliskane Daily Monitor
 
 on:
   schedule:
-    - cron: "0 8 * * *"  # 08:00 UTC = 04:00 EST (Montréal)
-  workflow_dispatch:
+    - cron: '0 12 * * *'   # 8h UTC = 9h Maroc (GMT+1)
+  workflow_dispatch:        # Lancement manuel depuis l'onglet Actions
+
+# ✅ CORRECTION #1 : permission d'écriture obligatoire pour git push
+permissions:
+  contents: write
 
 jobs:
   monitor:
-    name: Scrape & Detect Changes
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      # ✅ CORRECTION #2 : persist-credentials=true (défaut, mais explicite)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          persist-credentials: true
           fetch-depth: 0
 
-      # ── 2. Python ────────────────────────────────────────────────────────────
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: "pip"
+          python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          else
-            pip install requests beautifulsoup4
-          fi
+        run: pip install -r requirements.txt
 
-      # ── 3. Monitoring ────────────────────────────────────────────────────────
-      - name: Run monitoring script
+      - name: Run monitor
         env:
           EMAIL_SENDER:    ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD:  ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
-          # SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          # SMTP_PORT: ${{ secrets.SMTP_PORT }}
         run: python check_changes.py
 
-      # ── 4. Commit du CSV mis à jour + du log JSON ────────────────────────────
-      - name: Commit updated baseline & diff log
+      # ✅ CORRECTION #3 : commit et push des fichiers générés
+      - name: Commit & push data + logs
         run: |
-          git config user.name  "liliskane-bot"
-          git config user.email "bot@lifedesign.ca"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          mkdir -p data logs
-          git add data/ logs/
-
-          if git diff --cached --quiet; then
-            echo "Rien à committer — pas de changement de données."
+          git add data/projets_liliskane.csv logs/
+          
+          # Seulement committer s'il y a des changements
+          if git diff --staged --quiet; then
+            echo "✅ Aucun changement à committer"
           else
-            # ── Écriture du script dans un fichier temporaire (évite le conflit <<'EOF' en YAML)
-            cat > /tmp/summarize.py << 'PYEOF'
-            import json, glob, sys
-            logs = sorted(glob.glob("logs/diff_*.json"))
-            if logs:
-                try:
-                    with open(logs[-1]) as f:
-                        d = json.load(f)
-                    print(f"[{d.get('date', 'N/A')}] +{len(d.get('nouveaux', []))} nouveau(x), -{len(d.get('supprimes', []))} supprimé(s), ~{len(d.get('modifies', []))} modifié(s)")
-                except Exception:
-                    print("Mise à jour des données")
-            else:
-                print("Mise à jour baseline")
-            PYEOF
-            
-                        DIFF_SUMMARY=$(python /tmp/summarize.py)
-                        git commit -m "📊 $DIFF_SUMMARY"
-                        git pull origin main --rebase --autostash
-                        git push origin main
-                      fi
+            git commit -m "🤖 Auto-update $(date +'%Y-%m-%d') — baseline + logs"
+            git push
+          fi
