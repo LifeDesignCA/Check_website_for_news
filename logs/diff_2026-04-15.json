@@ -1,6 +1,19 @@
 {
   "date": "2026-04-15",
-  "nouveaux": [],
+  "nouveaux": [
+    {
+      "Source": "Addoha",
+      "Nom du Projet": "هل لديك أي سؤال؟",
+      "Ville": "Casablanca",
+      "Catégorie": "N/A",
+      "Statut": "N/A",
+      "Prix (DHS)": "N/A",
+      "Superficie Min": "N/A",
+      "Superficie Max": "N/A",
+      "Date de début": "N/A",
+      "Lien": "https://www.groupeaddoha.com/?page_id=1487"
+    }
+  ],
   "supprimes": [],
   "modifies": []
 }
