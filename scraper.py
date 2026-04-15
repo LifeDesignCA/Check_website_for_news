@@ -405,7 +405,7 @@ def scrape_liliskane() -> list[dict]:
 #
 # ══════════════════════════════════════════════════════════════════════════════
 
-_ADDOHA_BASE = "https://www.groupeaddoha.com"
+_ADDOHA_BASE = "https://www.groupeaddoha.com/?page_id=7"
 
 # URLs à tester dans l'ordre — le premier qui répond avec des projets est utilisé
 _ADDOHA_LISTING_CANDIDATES = [
