@@ -588,8 +588,8 @@ def scrape(
     if include_liliskane:
         all_projects.extend(scrape_liliskane())
 
-    if include_alomrane:
-        all_projects.extend(scrape_alomrane(fetch_details=alomrane_details))
+    # if include_alomrane:
+    #     all_projects.extend(scrape_alomrane(fetch_details=alomrane_details))
 
     if include_addoha:
         all_projects.extend(scrape_addoha())
