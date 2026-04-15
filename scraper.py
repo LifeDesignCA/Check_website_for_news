@@ -413,7 +413,7 @@ HEADERS = {
     "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,ar;q=0.7",
 }
 
-_ADDOHA_BASE = "https://www.groupeaddoha.com/"
+_ADDOHA_BASE = "https://www.groupeaddoha.com/?page_id=7"
 
 # pages où se trouvent les cartes projets
 _ADDOHA_LISTING_CANDIDATES = [
@@ -421,40 +421,58 @@ _ADDOHA_LISTING_CANDIDATES = [
 ]
 
 
-def _addoha_find_listing_url() -> str | None:
-    """Trouve la page contenant les cartes projets."""
 
-    for path in _ADDOHA_LISTING_CANDIDATES:
+def _addoha_find_listing_url():
 
-        url = urljoin(_ADDOHA_BASE, path)
+    try:
 
-        try:
-            resp = requests.get(url, headers=HEADERS, timeout=15)
+        r = requests.get(_ADDOHA_BASE, headers=HEADERS, timeout=15)
 
-            if resp.status_code == 200:
-                print(f"      ✔ URL Addoha fonctionnelle trouvée : {url}")
-                return url
+        if r.status_code == 200:
+            print(f"      ✔ URL Addoha fonctionnelle trouvée : {_ADDOHA_BASE}")
+            return r.text
 
-        except Exception:
-            continue
+    except Exception:
+
+        pass
 
     return None
 
 
-def _parse_addoha_project(detail_url):
+def _extract_project_links(html):
 
-    """Scrape une page projet individuelle"""
+    """Trouve tous les liens projet"""
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    links = set()
+
+    for a in soup.find_all("a", href=True):
+
+        href = a["href"]
+
+        if "?projet=" in href:
+
+            links.add(urljoin(_ADDOHA_BASE, href))
+
+    return list(links)
+
+
+def _parse_addoha_project(url):
+
+    """Scrape une page projet"""
 
     try:
 
-        r = requests.get(detail_url, headers=HEADERS, timeout=15)
+        r = requests.get(url, headers=HEADERS, timeout=15)
 
         soup = BeautifulSoup(r.content, "html.parser")
 
         text = soup.get_text(" ", strip=True)
 
-        # NOM PROJET
+        # NOM
         title = soup.find("h1")
+
         nom = title.get_text(strip=True) if title else "Projet Addoha"
 
         # VILLE
@@ -472,7 +490,9 @@ def _parse_addoha_project(detail_url):
         }
 
         for fr, ar in villes.items():
+
             if ar in text:
+
                 ville = fr
                 break
 
@@ -482,6 +502,7 @@ def _parse_addoha_project(detail_url):
         prix_match = re.search(r"([\d\.\s]+)\s*درهم", text)
 
         if prix_match:
+
             prix = prix_match.group(1).replace(".", "").replace(" ", "")
 
         return {
@@ -494,7 +515,7 @@ def _parse_addoha_project(detail_url):
             "Superficie Min": "N/A",
             "Superficie Max": "N/A",
             "Date de début": "N/A",
-            "Lien": detail_url,
+            "Lien": url,
         }
 
     except Exception:
@@ -502,74 +523,37 @@ def _parse_addoha_project(detail_url):
         return None
 
 
-def _addoha_parse_page(soup: BeautifulSoup, seen_urls: set):
-
-    """Trouve les projets sur la page"""
-
-    projects = []
-
-    # boutons "Informations sur le projet"
-    links = soup.find_all("a", string=re.compile("معلومات عن المشروع"))
-
-    for link in links:
-
-        href = link.get("href")
-
-        if not href:
-            continue
-
-        detail_url = urljoin(_ADDOHA_BASE, href)
-
-        if detail_url in seen_urls:
-            continue
-
-        seen_urls.add(detail_url)
-
-        project = _parse_addoha_project(detail_url)
-
-        if project:
-
-            projects.append(project)
-
-            print(
-                f"      ✔ {project['Nom du Projet'][:30]} | {project['Ville']} | {project['Prix (DHS)']}"
-            )
-
-        time.sleep(1)
-
-    return projects
-
-
 def scrape_addoha():
 
-    """Scraper principal Addoha"""
-
     all_projects = []
-    seen_urls = set()
 
     print("\n" + "─" * 50)
     print("🏢  SOURCE : Groupe Addoha")
     print("─" * 50)
 
-    listing_url = _addoha_find_listing_url()
+    html = _addoha_find_listing_url()
 
-    if not listing_url:
-        print("  ⚠️ Addoha inaccessible")
+    if not html:
+
+        print("⚠ Addoha inaccessible")
+
         return []
 
-    try:
+    project_links = _extract_project_links(html)
 
-        resp = requests.get(listing_url, headers=HEADERS, timeout=15)
+    for link in project_links:
 
-        soup = BeautifulSoup(resp.content, "html.parser")
+        project = _parse_addoha_project(link)
 
-        page_projects = _addoha_parse_page(soup, seen_urls)
+        if project:
 
-        all_projects.extend(page_projects)
+            all_projects.append(project)
 
-    except Exception as e:
+            print(
+                f"      ✔ {project['Nom du Projet']} | {project['Ville']} | {project['Prix (DHS)']}"
+            )
 
-        print(f"     ⚠ erreur : {e}")
+        time.sleep(1)
 
     print(f"\n  ✅ Addoha : {len(all_projects)} projets récupérés")
 
