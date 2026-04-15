@@ -2,7 +2,7 @@ name: Immobilier Maroc — Daily Monitor
 
 on:
   schedule:
-    - cron: '0 8 * * *'   # 8h UTC = 9h Maroc (GMT+1)
+    - cron: '0 12 * * *'   # 8h UTC = 9h Maroc (GMT+1)
   workflow_dispatch:        # Lancement manuel depuis Actions → Run workflow
 
 # ✅ Permission d'écriture obligatoire pour git push automatique
