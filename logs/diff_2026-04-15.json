@@ -1,6 +1,7 @@
 {
   "date": "2026-04-15",
-  "nouveaux": [
+  "nouveaux": [],
+  "supprimes": [
     {
       "Source": "Addoha",
       "Nom du Projet": "هل لديك أي سؤال؟",
@@ -14,6 +15,5 @@
       "Lien": "https://www.groupeaddoha.com/?page_id=1487"
     }
   ],
-  "supprimes": [],
   "modifies": []
 }
