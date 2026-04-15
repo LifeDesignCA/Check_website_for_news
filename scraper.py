@@ -459,51 +459,58 @@ def _extract_project_links(html):
 
 
 def _parse_addoha_project(url):
-
-    """Scrape une page projet"""
-
+    """Scrape une page projet avec une détection de ville plus précise"""
     try:
-
         r = requests.get(url, headers=HEADERS, timeout=15)
-
         soup = BeautifulSoup(r.content, "html.parser")
-
-        text = soup.get_text(" ", strip=True)
+        
+        # On cible uniquement la partie "Contenu" pour éviter le footer/menu
+        # Addoha utilise souvent 'main' ou des classes spécifiques pour le corps de page
+        content_area = soup.find("main") or soup.find("div", {"id": "content"}) or soup
+        text = content_area.get_text(" ", strip=True)
 
         # NOM
         title = soup.find("h1")
-
         nom = title.get_text(strip=True) if title else "Projet Addoha"
 
-        # VILLE
+        # VILLE (Mapping amélioré)
         ville = "N/A"
-
         villes = {
-            "Casablanca": "الدار البيضاء",
+            "Tanger": "طنجة",
             "Marrakech": "مراكش",
             "Rabat": "الرباط",
-            "Tanger": "طنجة",
             "Agadir": "أكادير",
             "Fès": "فاس",
             "Oujda": "وجدة",
             "Tétouan": "تطوان",
+            "Meknès": "مكناس",
+            "Salé": "سلا",
+            "Casablanca": "الدار البيضاء", # On le met à la fin pour qu'il ne soit pas prioritaire
         }
 
+        # ASTUCE : On cherche d'abord dans le titre ou les balises de localisation
+        location_tag = soup.find(class_=re.compile(r"location|city|breadcrumb", re.IGNORECASE))
+        location_text = location_tag.get_text() if location_tag else ""
+
         for fr, ar in villes.items():
-
-            if ar in text:
-
+            # Si la ville est dans le petit texte de localisation (plus précis)
+            if ar in location_text:
                 ville = fr
                 break
+        
+        # Si on n'a toujours rien trouvé, on cherche dans le texte principal
+        if ville == "N/A":
+            for fr, ar in villes.items():
+                if ar in text:
+                    ville = fr
+                    break
 
         # PRIX
         prix = "N/A"
-
-        prix_match = re.search(r"([\d\.\s]+)\s*درهم", text)
-
+        # Regex plus robuste pour les prix marocains
+        prix_match = re.search(r"([\d\.\s]{3,})\s*درهم", text)
         if prix_match:
-
-            prix = prix_match.group(1).replace(".", "").replace(" ", "")
+            prix = prix_match.group(1).replace(".", "").replace(" ", "").strip()
 
         return {
             "Source": "Addoha",
@@ -518,8 +525,8 @@ def _parse_addoha_project(url):
             "Lien": url,
         }
 
-    except Exception:
-
+    except Exception as e:
+        print(f"Erreur sur {url}: {e}")
         return None
 
 
