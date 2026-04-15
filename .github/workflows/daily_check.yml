@@ -1,0 +1,53 @@
+name: Immobilier Maroc — Daily Monitor
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # 8h UTC = 9h Maroc (GMT+1)
+  workflow_dispatch:        # Lancement manuel depuis Actions → Run workflow
+
+# ✅ Permission d'écriture obligatoire pour git push automatique
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60    # Al Omrane = ~600 projets, prévoir de la marge
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run multi-source monitor
+        env:
+          EMAIL_SENDER:    ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD:  ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        run: python check_changes.py
+
+      - name: Commit & push data + logs
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Ajouter les fichiers générés (nouveau nom + ancien au cas où)
+          git add data/ logs/ || true
+
+          if git diff --staged --quiet; then
+            echo "✅ Aucun changement à committer"
+          else
+            git commit -m "🤖 Auto-update $(date +'%Y-%m-%d') — multi-sources baseline + logs"
+            git push
+          fi
