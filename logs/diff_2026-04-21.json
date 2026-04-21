@@ -1,0 +1,265 @@
+{
+  "date": "2026-04-21",
+  "nouveaux": [
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Beethoven (HQE)",
+      "Ville": "Temara",
+      "Catégorie": "Haut Standing",
+      "Statut": "N/A",
+      "Prix (DHS)": "2 070 000 DHS",
+      "Superficie Min": "103 m²",
+      "Superficie Max": "130 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/207/beethoven-hqe"
+    },
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Dyar Al Bahia 2",
+      "Ville": "Temara",
+      "Catégorie": "Moyen Standing",
+      "Statut": "N/A",
+      "Prix (DHS)": "715 000 DHS",
+      "Superficie Min": "65 m²",
+      "Superficie Max": "109 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/161/dyar-al-bahia-2"
+    }
+  ],
+  "supprimes": [
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Al Araâr",
+      "Ville": "Agadir",
+      "Catégorie": "Haut Standing",
+      "Statut": "N/A",
+      "Prix (DHS)": "1 356 000 DHS",
+      "Superficie Min": "179 m²",
+      "Superficie Max": "287 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/94/al-araar"
+    },
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Al Araâr R+1",
+      "Ville": "Agadir",
+      "Catégorie": "Lots de terrains",
+      "Statut": "N/A",
+      "Prix (DHS)": "4 200 DHS",
+      "Superficie Min": "162 m²",
+      "Superficie Max": "248 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/148/al-araar-r-1"
+    },
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Dyar Al Bahia",
+      "Ville": "Temara",
+      "Catégorie": "Moyen Standing",
+      "Statut": "N/A",
+      "Prix (DHS)": "504 000 DHS",
+      "Superficie Min": "54 m²",
+      "Superficie Max": "80 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/161/dyar-al-bahia"
+    },
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Tulipe",
+      "Ville": "Casablanca",
+      "Catégorie": "Moyen Standing",
+      "Statut": "N/A",
+      "Prix (DHS)": "594 000 DHS",
+      "Superficie Min": "68 m²",
+      "Superficie Max": "157 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/162/tulipe"
+    }
+  ],
+  "modifies": [
+    {
+      "source": "Liliskane",
+      "projet": "Al Anbra",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/210/al-anbra",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "903 000 DHS",
+          "apres": "970 000 DHS"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Océane",
+      "ville": "Casablanca",
+      "url": "https://www.liliskane.com/projet/190/oceane",
+      "champs": {
+        "Superficie Min": {
+          "avant": "151 m²",
+          "apres": "158 m²"
+        },
+        "Superficie Max": {
+          "avant": "151 m²",
+          "apres": "158 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Al Anbar",
+      "ville": "Casablanca",
+      "url": "https://www.liliskane.com/projet/189/al-anbar",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "505 000 DHS",
+          "apres": "530 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "57 m²",
+          "apres": "60 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Assalam TG",
+      "ville": "Casablanca",
+      "url": "https://www.liliskane.com/projet/72/assalam-tg",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "1 370 000 DHS",
+          "apres": "1 760 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "179 m²",
+          "apres": "182 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Izdihar",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/218/izdihar",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "445 000 DHS",
+          "apres": "485 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "48 m²",
+          "apres": "54 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Patio Verde",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/192/patio-verde",
+      "champs": {
+        "Catégorie": {
+          "avant": "Haut Standing",
+          "apres": "Moyen Standing"
+        },
+        "Prix (DHS)": {
+          "avant": "580 000 DHS",
+          "apres": "607 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "45 m²",
+          "apres": "46 m²"
+        },
+        "Superficie Max": {
+          "avant": "142 m²",
+          "apres": "130 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Massylia",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/186/massylia",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "865 000 DHS",
+          "apres": "1 045 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "65 m²",
+          "apres": "80 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Jasmin",
+      "ville": "Casablanca",
+      "url": "https://www.liliskane.com/projet/179/jasmin",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "700 000 DHS",
+          "apres": "730 000 DHS"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Al Yassamine",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/77/al-yassamine",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "504 000 DHS",
+          "apres": "586 000 DHS"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Al Youssoufia R+3",
+      "ville": "Had Soualem",
+      "url": "https://www.liliskane.com/projet/176/al-youssoufia-r-3",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "4 945 DHS",
+          "apres": "4 950 DHS"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Riad Garden I",
+      "ville": "Casablanca",
+      "url": "https://www.liliskane.com/projet/95/riad-garden-i",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "2 156 000 DHS",
+          "apres": "2 410 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "89 m²",
+          "apres": "101 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Jnane Souss",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/188/jnane-souss",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "745 000 DHS",
+          "apres": "860 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "71 m²",
+          "apres": "82 m²"
+        }
+      }
+    }
+  ]
+}
