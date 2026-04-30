@@ -1,0 +1,19 @@
+{
+  "date": "2026-04-30",
+  "nouveaux": [],
+  "supprimes": [],
+  "modifies": [
+    {
+      "source": "Addoha",
+      "projet": "البدر تيط مليل",
+      "ville": "Rabat",
+      "url": "https://www.groupeaddoha.com/?projet=%d8%a7%d9%84%d8%a8%d8%af%d8%b1-%d8%aa%d9%8a%d8%b7-%d9%85%d9%84%d9%8a%d9%84",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "156000",
+          "apres": "160000"
+        }
+      }
+    }
+  ]
+}
