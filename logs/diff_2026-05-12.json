@@ -1,0 +1,35 @@
+{
+  "date": "2026-05-12",
+  "nouveaux": [],
+  "supprimes": [],
+  "modifies": [
+    {
+      "source": "Liliskane",
+      "projet": "Al Anbra",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/210/al-anbra",
+      "champs": {
+        "Prix (DHS)": {
+          "avant": "970 000 DHS",
+          "apres": "595 000 DHS"
+        },
+        "Superficie Min": {
+          "avant": "97 m²",
+          "apres": "52 m²"
+        }
+      }
+    },
+    {
+      "source": "Liliskane",
+      "projet": "Odyssée",
+      "ville": "Agadir",
+      "url": "https://www.liliskane.com/projet/219/odyssee",
+      "champs": {
+        "Ville": {
+          "avant": "Casablanca",
+          "apres": "Agadir"
+        }
+      }
+    }
+  ]
+}
