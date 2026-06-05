@@ -1,0 +1,32 @@
+{
+  "date": "2026-06-05",
+  "nouveaux": [
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Odyssée Studios",
+      "Ville": "Agadir",
+      "Catégorie": "Haut Standing",
+      "Statut": "N/A",
+      "Prix (DHS)": "555 000 DHS",
+      "Superficie Min": "38 m²",
+      "Superficie Max": "47 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/220/odyssee-studios"
+    }
+  ],
+  "supprimes": [
+    {
+      "Source": "Liliskane",
+      "Nom du Projet": "Odyssée",
+      "Ville": "Agadir",
+      "Catégorie": "Haut Standing",
+      "Statut": "N/A",
+      "Prix (DHS)": "1 010 000 DHS",
+      "Superficie Min": "73 m²",
+      "Superficie Max": "111 m²",
+      "Date de début": "N/A",
+      "Lien": "https://www.liliskane.com/projet/220/odyssee"
+    }
+  ],
+  "modifies": []
+}
